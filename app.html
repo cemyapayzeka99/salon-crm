@@ -986,8 +986,8 @@
         }
     </script>
 
-    <!-- APP CONTAINER -->
-    <div id="appContainer" style="display: none;" class="container">
+    <!-- APP CONTAINER - Always visible -->
+    <div id="appContainer" class="container">
         <!-- SIDEBAR -->
         <div class="sidebar">
             <div class="logo">✂️ SalonPro</div>
@@ -2046,6 +2046,10 @@
         }
 
         // UTILITIES
+        function toggleUserMenu() {
+            document.getElementById('userMenu').classList.toggle('active');
+        }
+
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
