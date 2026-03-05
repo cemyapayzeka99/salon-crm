@@ -1,0 +1,3 @@
+# Netlify redirects
+/index.html  /login.html  200
+/*    /login.html   200
