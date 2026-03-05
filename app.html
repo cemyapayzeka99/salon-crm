@@ -1073,14 +1073,13 @@
                                 <tr>
                                     <th>Ad Soyad</th>
                                     <th>Telefon</th>
-                                    <th>Email</th>
                                     <th>Kayıt Tarihi</th>
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody id="customersTableBody">
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 40px;">
+                                    <td colspan="4" style="text-align: center; padding: 40px;">
                                         <div class="empty-state">
                                             <div class="empty-state-icon">👥</div>
                                             <h3>Müşteri yok</h3>
@@ -1174,6 +1173,19 @@
     </div>
 
     <!-- MODALS -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="noteModalTitle">Müşteri Notu</h2>
+                <button class="modal-close" onclick="closeModal('noteModal')">&times;</button>
+            </div>
+            <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid var(--border); border-radius: 8px; padding: 16px; color: var(--text); line-height: 1.6; white-space: pre-wrap;" id="noteContent"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('noteModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="customerModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1181,24 +1193,16 @@
                 <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
             </div>
             <div class="form-group">
-                <label>Ad Soyad</label>
-                <input type="text" id="customerName" placeholder="Müşteri adı">
+                <label>Ad Soyad *</label>
+                <input type="text" id="customerName" placeholder="Müşteri adı" required>
             </div>
             <div class="form-group">
-                <label>Telefon</label>
-                <input type="tel" id="customerPhone" placeholder="0532-123-4567">
+                <label>Telefon *</label>
+                <input type="tel" id="customerPhone" placeholder="0532-123-4567" required>
             </div>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="customerEmail" placeholder="email@example.com">
-            </div>
-            <div class="form-group">
-                <label>Saç Tipi</label>
-                <select id="customerHairType" style="background-color: var(--bg-light) !important; color: var(--text) !important;">
-                    <option value="Düz" style="background-color: var(--bg-light); color: var(--text);">Düz</option>
-                    <option value="Dalgalı" style="background-color: var(--bg-light); color: var(--text);">Dalgalı</option>
-                    <option value="Kıvırcık" style="background-color: var(--bg-light); color: var(--text);">Kıvırcık</option>
-                </select>
+                <label>Not</label>
+                <textarea id="customerNote" placeholder="Müşteri hakkında not yazın..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; min-height: 100px; resize: vertical; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--primary)'; this.style.background='rgba(139, 92, 246, 0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.background='rgba(255,255,255,0.05)';"></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('customerModal')">İptal</button>
@@ -1569,15 +1573,14 @@
             const search = document.getElementById('customerSearch').value.toLowerCase();
             const filtered = crm.customers.filter(c => 
                 c.name.toLowerCase().includes(search) ||
-                c.phone.includes(search) ||
-                c.email.toLowerCase().includes(search)
+                c.phone.includes(search)
             );
 
             const tbody = document.getElementById('customersTableBody');
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px;">
+                        <td colspan="4" style="text-align: center; padding: 40px;">
                             <div class="empty-state">
                                 <div class="empty-state-icon">👥</div>
                                 <h3>${search ? 'Sonuç bulunamadı' : 'Müşteri yok'}</h3>
@@ -1591,10 +1594,10 @@
                     <tr>
                         <td><strong>${customer.name}</strong></td>
                         <td>${customer.phone}</td>
-                        <td>${customer.email}</td>
                         <td>${new Date(customer.createdAt).toLocaleDateString('tr-TR')}</td>
                         <td>
                             <div class="action-buttons">
+                                ${customer.note ? `<button class="btn-edit" onclick="viewCustomerNote(${customer.id}, '${customer.name}', '${customer.note.replace(/'/g, "\\'")}')">Notu Görüntüle</button>` : ''}
                                 <button class="btn-edit" onclick="editCustomer(${customer.id})">Düzenle</button>
                                 <button class="btn-delete" onclick="deleteCustomer(${customer.id})">Sil</button>
                             </div>
@@ -1602,6 +1605,12 @@
                     </tr>
                 `).join('');
             }
+        }
+
+        function viewCustomerNote(id, name, note) {
+            document.getElementById('noteModalTitle').textContent = `${name} - Notu`;
+            document.getElementById('noteContent').textContent = note || 'Not yazılmamış';
+            document.getElementById('noteModal').classList.add('active');
         }
 
         function searchCustomers() {
@@ -1612,8 +1621,7 @@
             document.getElementById('customerModalTitle').textContent = 'Yeni Müşteri';
             document.getElementById('customerName').value = '';
             document.getElementById('customerPhone').value = '';
-            document.getElementById('customerEmail').value = '';
-            document.getElementById('customerHairType').value = 'Düz';
+            document.getElementById('customerNote').value = '';
             document.getElementById('customerModal').classList.add('active');
             document.getElementById('customerModal').dataset.editId = '';
         }
@@ -1623,8 +1631,7 @@
             document.getElementById('customerModalTitle').textContent = 'Müşteri Düzenle';
             document.getElementById('customerName').value = customer.name;
             document.getElementById('customerPhone').value = customer.phone;
-            document.getElementById('customerEmail').value = customer.email;
-            document.getElementById('customerHairType').value = customer.hairType;
+            document.getElementById('customerNote').value = customer.note || '';
             document.getElementById('customerModal').classList.add('active');
             document.getElementById('customerModal').dataset.editId = id;
         }
@@ -1632,11 +1639,10 @@
         function saveCustomer() {
             const name = document.getElementById('customerName').value;
             const phone = document.getElementById('customerPhone').value;
-            const email = document.getElementById('customerEmail').value;
-            const hairType = document.getElementById('customerHairType').value;
+            const note = document.getElementById('customerNote').value;
 
-            if (!name || !phone || !email) {
-                showAlert('Lütfen tüm alanları doldurun', 'danger');
+            if (!name || !phone) {
+                showAlert('İsim ve Telefon zorunludur!', 'danger');
                 return;
             }
 
@@ -1646,8 +1652,7 @@
                 if (customer) {
                     customer.name = name;
                     customer.phone = phone;
-                    customer.email = email;
-                    customer.hairType = hairType;
+                    customer.note = note;
                     showAlert('Müşteri güncelendi', 'success');
                 }
             } else {
@@ -1655,8 +1660,7 @@
                     id: Date.now(),
                     name,
                     phone,
-                    email,
-                    hairType,
+                    note,
                     createdAt: new Date().toISOString()
                 });
                 showAlert('Müşteri eklendi', 'success');
