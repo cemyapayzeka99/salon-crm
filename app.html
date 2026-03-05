@@ -1023,7 +1023,7 @@
                     <div class="dashboard-grid">
                         <div class="card">
                             <div class="card-label">Bugünün Tarihi</div>
-                            <div class="card-value" id="todayDate" style="font-size: 24px;">-</div>
+                            <div class="card-value" id="todayDate" style="font-size: 18px; line-height: 1.4;">-</div>
                             <div class="card-subtitle" id="todayTime">-</div>
                         </div>
                         <div class="card">
@@ -1491,7 +1491,7 @@
             const todayStr = now.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             
-            document.getElementById('todayDate').textContent = todayStr;
+            document.getElementById('todayDate').textContent = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
             document.getElementById('todayTime').textContent = timeStr;
 
             // Today's appointments
