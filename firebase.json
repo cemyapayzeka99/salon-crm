@@ -8,6 +8,18 @@
     ],
     "rewrites": [
       {
+        "source": "/app.html",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/admin-app.html",
+        "destination": "/admin-app.html"
+      },
+      {
+        "source": "/admin-login.html",
+        "destination": "/admin-login.html"
+      },
+      {
         "source": "**",
         "destination": "/login.html"
       }
