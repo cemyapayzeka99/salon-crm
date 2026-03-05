@@ -1449,6 +1449,13 @@
 
         // LOGIN FUNCTIONS REMOVED - See login.html
 
+        function logout() {
+            localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentUser');
+            crm.currentUser = null;
+            window.location.href = 'login.html';
+        }
+
         // UI MANAGEMENT
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
