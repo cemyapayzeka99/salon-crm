@@ -222,10 +222,6 @@
             margin-left: auto;
         }
     </style>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="login-container">
@@ -287,6 +283,10 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -327,7 +327,6 @@
                 return;
             }
 
-            // Firebase'den kullanıcı ara
             database.ref('users').orderByChild('email').equalTo(email).once('value', (snapshot) => {
                 if (snapshot.exists()) {
                     let found = false;
@@ -379,12 +378,10 @@
                 return;
             }
 
-            // Email zaten var mı kontrol et
             database.ref('users').orderByChild('email').equalTo(email).once('value', (snapshot) => {
                 if (snapshot.exists()) {
                     showAlert('Bu email zaten kullanılıyor', 'danger');
                 } else {
-                    // Yeni kullanıcı oluştur
                     const newUser = {
                         salon,
                         email,
