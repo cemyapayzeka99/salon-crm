@@ -222,6 +222,10 @@
             margin-left: auto;
         }
     </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="login-container">
@@ -283,10 +287,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
-    
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -300,6 +300,7 @@
             measurementId: "G-1P6EV84R2L"
         };
 
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -395,6 +396,10 @@
 
                     database.ref('users').push(newUser).then(() => {
                         showAlert('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
+                        document.getElementById('signupSalon').value = '';
+                        document.getElementById('signupEmail').value = '';
+                        document.getElementById('signupPassword').value = '';
+                        document.getElementById('signupPasswordConfirm').value = '';
                         setTimeout(() => toggleAuthForm(), 1500);
                     }).catch((error) => {
                         showAlert('Hata: ' + error.message, 'danger');
