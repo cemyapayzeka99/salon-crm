@@ -182,17 +182,17 @@
             display: flex;
             gap: 12px;
             align-items: center;
-            animation: slideDown 0.3s ease;
+            animation: slideUp 0.3s ease;
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             max-width: 400px;
             z-index: 2000;
         }
 
-        @keyframes slideDown {
+        @keyframes slideUp {
             from {
-                transform: translateY(-20px);
+                transform: translateY(20px);
                 opacity: 0;
             }
             to {
@@ -283,18 +283,25 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
+    
     <script>
-        class SalonCRM {
-            constructor() {
-                this.users = JSON.parse(localStorage.getItem('users')) || [];
-            }
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB204Njob3zyQwCEtqzlysLSl8nlZbqA7k",
+            authDomain: "salon-crm-2ef89.firebaseapp.com",
+            databaseURL: "https://salon-crm-2ef89-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "salon-crm-2ef89",
+            storageBucket: "salon-crm-2ef89.firebasestorage.app",
+            messagingSenderId: "32532475239",
+            appId: "1:32532475239:web:81d6f34bfab82c919c53c2",
+            measurementId: "G-1P6EV84R2L"
+        };
 
-            saveData() {
-                localStorage.setItem('users', JSON.stringify(this.users));
-            }
-        }
-
-        const crm = new SalonCRM();
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
         function togglePasswordVisibility(fieldId) {
             const field = document.getElementById(fieldId);
@@ -319,20 +326,35 @@
                 return;
             }
 
-            const user = crm.users.find(u => u.email === email && u.password === password);
-            if (user) {
-                if (rememberMe) {
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                    sessionStorage.removeItem('currentUser');
+            // Firebase'den kullanıcı ara
+            database.ref('users').orderByChild('email').equalTo(email).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    let found = false;
+                    snapshot.forEach((child) => {
+                        if (child.val().password === password) {
+                            found = true;
+                            const user = child.val();
+                            user.id = child.key;
+                            
+                            if (rememberMe) {
+                                localStorage.setItem('currentUser', JSON.stringify(user));
+                                sessionStorage.removeItem('currentUser');
+                            } else {
+                                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                                localStorage.removeItem('currentUser');
+                            }
+                            
+                            window.location.href = 'app.html';
+                        }
+                    });
+                    
+                    if (!found) {
+                        showAlert('Email veya şifre yanlış', 'danger');
+                    }
                 } else {
-                    sessionStorage.setItem('currentUser', JSON.stringify(user));
-                    localStorage.removeItem('currentUser');
+                    showAlert('Email veya şifre yanlış', 'danger');
                 }
-                
-                window.location.href = 'app.html';
-            } else {
-                showAlert('Email veya şifre yanlış', 'danger');
-            }
+            });
         }
 
         function signup() {
@@ -356,24 +378,29 @@
                 return;
             }
 
-            if (crm.users.find(u => u.email === email)) {
-                showAlert('Bu email zaten kullanılıyor', 'danger');
-                return;
-            }
+            // Email zaten var mı kontrol et
+            database.ref('users').orderByChild('email').equalTo(email).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    showAlert('Bu email zaten kullanılıyor', 'danger');
+                } else {
+                    // Yeni kullanıcı oluştur
+                    const newUser = {
+                        salon,
+                        email,
+                        password,
+                        createdAt: new Date().toISOString(),
+                        paymentStatus: 'Ödenmedi',
+                        paket: 'BAŞLANGIÇ'
+                    };
 
-            const newUser = {
-                id: Date.now(),
-                salon,
-                email,
-                password,
-                createdAt: new Date().toISOString(),
-                paymentStatus: 'Ödenmedi'
-            };
-
-            crm.users.push(newUser);
-            crm.saveData();
-            showAlert('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
-            toggleAuthForm();
+                    database.ref('users').push(newUser).then(() => {
+                        showAlert('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
+                        setTimeout(() => toggleAuthForm(), 1500);
+                    }).catch((error) => {
+                        showAlert('Hata: ' + error.message, 'danger');
+                    });
+                }
+            });
         }
 
         function toggleAuthForm() {
