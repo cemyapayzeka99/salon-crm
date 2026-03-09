@@ -283,12 +283,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB204Njob3zyQwCEtqzlysLSl8nlZbqA7k",
             authDomain: "salon-crm-2ef89.firebaseapp.com",
@@ -300,14 +298,12 @@
             measurementId: "G-1P6EV84R2L"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         function togglePasswordVisibility(fieldId) {
             const field = document.getElementById(fieldId);
             const button = event.target;
-            
             if (field.type === 'password') {
                 field.type = 'text';
                 button.textContent = '⊗';
@@ -335,7 +331,6 @@
                             found = true;
                             const user = child.val();
                             user.id = child.key;
-                            
                             if (rememberMe) {
                                 localStorage.setItem('currentUser', JSON.stringify(user));
                                 sessionStorage.removeItem('currentUser');
@@ -343,11 +338,9 @@
                                 sessionStorage.setItem('currentUser', JSON.stringify(user));
                                 localStorage.removeItem('currentUser');
                             }
-                            
                             window.location.href = 'app.html';
                         }
                     });
-                    
                     if (!found) {
                         showAlert('Email veya şifre yanlış', 'danger');
                     }
@@ -367,12 +360,10 @@
                 showAlert('Lütfen tüm alanları doldurun', 'danger');
                 return;
             }
-
             if (password !== confirm) {
                 showAlert('Şifreler eşleşmiyor', 'danger');
                 return;
             }
-
             if (password.length < 6) {
                 showAlert('Şifre en az 6 karakter olmalı', 'danger');
                 return;
@@ -390,7 +381,6 @@
                         paymentStatus: 'Ödenmedi',
                         paket: 'BAŞLANGIÇ'
                     };
-
                     database.ref('users').push(newUser).then(() => {
                         showAlert('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
                         document.getElementById('signupSalon').value = '';
@@ -415,10 +405,7 @@
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
-            alertDiv.innerHTML = `
-                ${message}
-                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
-            `;
+            alertDiv.innerHTML = `${message}<button class="alert-close" onclick="this.parentElement.remove()">×</button>`;
             document.body.appendChild(alertDiv);
             setTimeout(() => alertDiv.remove(), 4000);
         }
